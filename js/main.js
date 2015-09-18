@@ -1,4 +1,8 @@
+/* global jQuery */
+/* global $ */
+
 jQuery(document).ready(function($){
+    'use strict';
     //check if the .cd-image-container is in the viewport 
     //if yes, animate it
     checkPosition($('.cd-image-container'));
@@ -20,9 +24,30 @@ jQuery(document).ready(function($){
             updateLabel(actual.find('.cd-image-label[data-type="original"]'), actual.find('.cd-resize-img'), 'right');
         });
     });
+    
+    /* no select for the slider */
+
+	$(function(){
+		$.extend($.fn.disableTextSelect = function() {
+            
+            /* remove $.browser as it is deprecated in jQuery > 1.9 and replace it with navigator.userAgent */
+            var sUsrAg = navigator.userAgent;
+			return this.each(function(){
+				if( sUsrAg.indexOf("Firefox") > -1 ){//Firefox
+					$(this).css('MozUserSelect','none');
+				}else if( sUsrAg.indexOf("MSIE") > -1 ){//IE
+					$(this).bind('selectstart',function(){return false;});
+				}else{//Opera, etc.
+					$(this).mousedown(function(){return false;});
+				}
+			});
+		});
+		$('.noSelect').disableTextSelect();//No text selection on elements with a class of 'noSelect'
+	});
 });
 
 function checkPosition(container) {
+    'use strict';
     container.each(function(){
         var actualContainer = $(this);
         if( $(window).scrollTop() + $(window).height()*0.5 > actualContainer.offset().top) {
@@ -33,51 +58,58 @@ function checkPosition(container) {
 
 //draggable funtionality - credits to http://css-tricks.com/snippets/jquery/draggable-without-jquery-ui/
 function drags(dragElement, resizeElement, container, labelContainer, labelResizeElement) {
-    dragElement.on("mousedown vmousedown", function(e) {
+    'use strict';
+    
+    var leftValue;
+	var widthValue;
+	
+	dragElement.on('mousedown vmousedown', function(e) {
         dragElement.addClass('draggable');
         resizeElement.addClass('resizable');
-
+		
+		var dragElementOffset = ($('.draggable').outerWidth() / 2);
+ 
         var dragWidth = dragElement.outerWidth(),
             xPosition = dragElement.offset().left + dragWidth - e.pageX,
             containerOffset = container.offset().left,
             containerWidth = container.outerWidth(),
-            minLeft = containerOffset + 10,
-            maxLeft = containerOffset + containerWidth - dragWidth - 10;
+            minLeft = containerOffset - dragElementOffset,
+            maxLeft = containerOffset + containerWidth - dragWidth + dragElementOffset;
         
-        dragElement.parents().on("mousemove vmousemove", function(e) {
+        dragElement.parents().on('mousemove vmousemove', function(e) {
+			
             leftValue = e.pageX + xPosition - dragWidth;
             
-            //constrain the draggable element to move inside his container
+			//constrain the draggable element to move inside its container
             if(leftValue < minLeft ) {
                 leftValue = minLeft;
             } else if ( leftValue > maxLeft) {
                 leftValue = maxLeft;
             }
-
+ 
             widthValue = (leftValue + dragWidth/2 - containerOffset)*100/containerWidth+'%';
             
-            $('.draggable').css('left', widthValue).on("mouseup vmouseup", function() {
+            $('.draggable').css('left', widthValue).on('mouseup vmouseup', function() {
                 $(this).removeClass('draggable');
                 resizeElement.removeClass('resizable');
             });
-
+ 
             $('.resizable').css('width', widthValue); 
-
-            updateLabel(labelResizeElement, resizeElement, 'left');
-            updateLabel(labelContainer, resizeElement, 'right');
             
-        }).on("mouseup vmouseup", function(e){
+        }).on('mouseup vmouseup', function(e){
             dragElement.removeClass('draggable');
             resizeElement.removeClass('resizable');
+			e.preventDefault();
         });
-        e.preventDefault();
-    }).on("mouseup vmouseup", function(e) {
+    }).on('mouseup vmouseup', function(e) {
         dragElement.removeClass('draggable');
         resizeElement.removeClass('resizable');
+		e.preventDefault();
     });
 }
 
 function updateLabel(label, resizeElement, position) {
+    'use strict';
     if(position == 'left') {
         ( label.offset().left + label.outerWidth() < resizeElement.offset().left + resizeElement.outerWidth() ) ? label.removeClass('is-hidden') : label.addClass('is-hidden') ;
     } else {
