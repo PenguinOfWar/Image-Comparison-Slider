@@ -16,7 +16,7 @@ This fork addresses these issues.
 Disable text selection plugin provided by [Chris Barr](http://chris-barr.com/2009/02/disable_text_selection_with_jquery/) with modifications by myself.
 
 ### License
-Free for private use, but you'll need to purchase a license from CodyHouse to use it on a product.Image Comparison Slider
+Free for private use, but you'll need to purchase a license from CodyHouse to use it on a product.
 
 [Article on CodyHouse](http://codyhouse.co/gem/css-jquery-image-comparison-slider/)
 
